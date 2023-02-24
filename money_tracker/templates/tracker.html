@@ -23,5 +23,12 @@
     </tr>
     {% endfor %}
 </table>
+<br>
+<a href="{% url 'money_tracker:create_transaction' %}">
+    <button>
+        Transaksi Baru
+    </button>
+</a>
+</br>
 
 {% endblock content %}
