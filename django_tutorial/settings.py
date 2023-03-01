@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,9 @@ SECRET_KEY = 'django-insecure-^@#*g%8z+(p=ta4e$+^oq$%9+s%o_a6=4@_*k8m(+oq)(n7-6$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [f'{APP_NAME}.up.railway.app']
+APP_NAME = os.getenv('APP_NAME', '')
+
+ALLOWED_HOSTS = [f'https://{APP_NAME}.up.railway.app', 'localhost']
 CSRF_TRUSTED_ORIGINS = [f'https://{APP_NAME}.up.railway.app']
 
 # Application definition
