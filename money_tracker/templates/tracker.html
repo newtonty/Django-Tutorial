@@ -1,40 +1,72 @@
 {% extends 'base.html' %}
+{% load bootstrap5 %}
 
 {% block content %}
-<h5>Nama: </h5>
-<p>Nataya</p>
+<title>Money Tracker</title>
 
-<table>
-    <tr>
-        <th>Nama</th>
-        <th>Jenis</th>
-        <th>Jumlah</th>
-        <th>Tanggal</th>
-        <th>Deskripsi</th>
-    </tr>
-    {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
-    {% for transaction in list_of_transactions %}
-    <tr>
-        <td>{{transaction.name}}</td>
-        <td>{{transaction.type}}</td>
-        <td>{{transaction.amount}}</td>
-        <td>{{transaction.date}}</td>
-        <td>{{transaction.description}}</td>
-    </tr>
-    {% endfor %}
-</table>
-<h5>Sesi terakhir login: {{ last_login }}</h5>
-<br>
-<a href="{% url 'money_tracker:create_transaction' %}">
-    <button>
-        Transaksi Baru
-    </button>
-</a>
-</br>
-<a href="{% url 'money_tracker:logout' %}">
-    <button>
-        Logout
-    </button>
-</a>
+<body>
+    <br>
+    <h5>Hai {{name}}! Ada transaksi baru apa hari ini?</h5>
 
+    <br>
+    <br>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for transaction in list_of_transactions %}
+        <div class="col">
+            <div class="card" style="width: 19rem;">
+                <div class="card-body">
+                  <h5 class="card-title">{{transaction.name}}</h5>
+                  <p class="card-text">{{transaction.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">Name: {{transaction.name}}</li>
+                  <li class="list-group-item">Type: {{transaction.type}}</li>
+                  <li class="list-group-item">Amount: {{transaction.amount}}</li>
+                  <li class="list-group-item">Date: {{transaction.date}}</li>
+                </ul>
+                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                    <div class="row">
+                        <div class="col"></div>
+                        <div class="col"></div>
+                        <div class="col"></div>
+                        <div class="col">
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <a href="{% url 'money_tracker:modify_transaction' transaction.pk %}">
+                                    <button type="button" class="btn btn-primary">
+                                        Ubah
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <a href="{% url 'money_tracker:delete_transaction' transaction.pk %}">
+                                    <button type="button" class="btn btn-primary">
+                                        Hapus
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <br>
+    <a href="{% url 'money_tracker:create_transaction' %}">
+        <button type="button" class="btn btn-primary">
+            Transaksi Baru
+        </button>
+    </a>
+    
+    <br>
+    <br>
+    <footer>
+        <div class="footer">
+            <p>Sesi terakhir login: {{ last_login }}</p>
+        </div>
+    </footer>
+</body>
 {% endblock content %}

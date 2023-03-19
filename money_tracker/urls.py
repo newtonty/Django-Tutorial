@@ -8,7 +8,8 @@ from money_tracker.views import register #sesuaikan dengan nama fungsi yang dibu
 from money_tracker.views import login_user #sesuaikan dengan nama fungsi yang dibuat
 from money_tracker.views import logout_user
 from django.contrib.auth.decorators import login_required
-
+from money_tracker.views import modify_transaction
+from money_tracker.views import delete_transaction
 
 app_name = 'money_tracker'
 
@@ -22,4 +23,6 @@ urlpatterns = [
     path('register/', register, name='register'), #sesuaikan dengan nama fungsi yang dibuat
     path('login/', login_user, name='login'),
     path('logout/', logout_user, name='logout'),
+    path('modify/<int:id>', modify_transaction, name='modify_transaction'),
+    path('delete/<int:id>', delete_transaction, name='delete_transaction'),
 ]

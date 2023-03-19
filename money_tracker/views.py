@@ -18,7 +18,6 @@ from django.urls import reverse
 
 # Create your views here.
 
-...
 @login_required(login_url='/money_tracker/login/')
 def show_tracker(request):
     transaction_data = TransactionRecord.objects.all()
@@ -68,6 +67,30 @@ def register(request):
 
     context = {'form':form}
     return render(request, 'register.html', context)
+
+def modify_transaction(request, id):
+    # Get data berdasarkan ID
+    transaction = TransactionRecord.objects.get(pk = id)
+
+    # Set instance pada form dengan data dari transaction
+    form = TransactionRecordForm(request.POST or None, instance=transaction)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return HttpResponseRedirect(reverse('money_tracker:show_tracker'))
+
+    context = {'form': form}
+    return render(request, "modify_transaction.html", context)
+
+def delete_transaction(request, id):
+    # Get data berdasarkan ID
+    transaction = TransactionRecord.objects.get(pk = id)
+    # Hapus data
+    transaction.delete()
+    # Kembali ke halaman awal
+    return HttpResponseRedirect(reverse('money_tracker:show_tracker'))
+
 
 def login_user(request):
     if request.method == 'POST':

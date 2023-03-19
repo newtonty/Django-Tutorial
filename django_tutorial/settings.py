@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'money_tracker'
+    'money_tracker',
+    'bootstrap5',
 ]
 
 MIDDLEWARE = [
