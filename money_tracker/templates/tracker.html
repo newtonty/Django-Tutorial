@@ -1,72 +1,106 @@
 {% extends 'base.html' %}
-{% load bootstrap5 %}
 
 {% block content %}
-<title>Money Tracker</title>
-
-<body>
-    <br>
-    <h5>Hai {{name}}! Ada transaksi baru apa hari ini?</h5>
-
-    <br>
-    <br>
-    <div class="row row-cols-1 row-cols-md-4 g-4">
-        {% for transaction in list_of_transactions %}
-        <div class="col">
-            <div class="card" style="width: 19rem;">
-                <div class="card-body">
-                  <h5 class="card-title">{{transaction.name}}</h5>
-                  <p class="card-text">{{transaction.description}}</p>
-                </div>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Name: {{transaction.name}}</li>
-                  <li class="list-group-item">Type: {{transaction.type}}</li>
-                  <li class="list-group-item">Amount: {{transaction.amount}}</li>
-                  <li class="list-group-item">Date: {{transaction.date}}</li>
-                </ul>
-                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                    <div class="row">
-                        <div class="col"></div>
-                        <div class="col"></div>
-                        <div class="col"></div>
-                        <div class="col">
-                            <div class="btn-group" role="group" aria-label="Basic example">
-                                <a href="{% url 'money_tracker:modify_transaction' transaction.pk %}">
-                                    <button type="button" class="btn btn-primary">
-                                        Ubah
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="btn-group" role="group" aria-label="Basic example">
-                                <a href="{% url 'money_tracker:delete_transaction' transaction.pk %}">
-                                    <button type="button" class="btn btn-primary">
-                                        Hapus
-                                    </button>
-                                </a>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $.get("/tracker/json/", function(data) {
+            for (i=0; i<data.length; i++){
+                $('#tracker').append(`
+                <div id="${data[i].id}--task" class="col-md-6 col-lg-3 mb-3">
+                    <div class="card d-flex">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${data[i].fields.name}</h5>
+                            <p class="card-text date">${data[i].fields.date}</p>
+                            <p class="card-text">${data[i].fields.type}</p>
+                            <p class="card-text">${data[i].fields.amount}</p>
+                            <p class="card-text">${data[i].fields.description}</p>
+                            <div class="mt-auto">
+                                <a href="/tracker/delete/${data[i].pk}" class="btn btn-primary delete mb-2">Hapus</a>
+                                <a href="/tracker/modify/${data[i].pk}" class="btn btn-secondary mb-2">Ubah</a>
                             </div>
                         </div>
                     </div>
                 </div>
+                `)
+            }
+        });
+
+        $("#submit_btn").click(function(){
+            $.post("/tracker/create-ajax/", {
+                name: $("#name").val(),
+                type: $("#type").val(),
+                amount: $("#amount").val(),
+                description: $("#description").val()
+            },
+            function(result, status){
+                if (status == 'success'){
+                    $("#tracker").append(`
+                    <div id="${result.id}--task" class="col-md-6 col-lg-3 mb-3">
+                        <div class="card d-flex">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${result.name}</h5>
+                                <p class="card-text date">${result.date}</p>
+                                <p class="card-text">${result.type}</p>
+                                <p class="card-text">${result.amount}</p>
+                                <p class="card-text">${result.description}</p>
+                                <div class="mt-auto">
+                                    <a href="/tracker/delete/${result.id}" class="btn btn-primary delete mb-2">Hapus</a>
+                                    <a href="/tracker/modify/${result.id}" class="btn btn-secondary mb-2">Ubah</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `);
+                $('#name').val('')
+                $('#date').val('')
+                $('#amount').val('')
+                $('#description').val('')
+                }
+            })
+        })
+    })
+</script>
+
+
+    
+<body>
+    <h5>Nama: </h5>
+    <p>{{name}}</p>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+        Tambah Transaksi
+    </button>
+
+    <div class="modal" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="createModalLabel">Tambah Transaksi</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+            </div>
+            <div class="modal-body">
+            {% csrf_token %}
+            <label for="name" class="form-label">Judul transaksi:</label><br>
+            <input type="text" id="name" class="form-control" name="name" placeholder="Bayar UKT"><br>
+            <label for="type" class="form-label">Tipe transaksi:</label>
+            <select name="type" id="type" class="form-select" aria-label="Default select example">
+                <option selected value="Pemasukan">Pemasukan</option>
+                <option value="Pengeluaran">Pengeluaran</option>
+            </select><br>
+            <label for="amount" class="form-label">Jumlah transaksi:</label><br>
+            <input type="number" id="amount" class="form-control" name="amount" placeholder="100000"><br>
+            <label for="description" class="form-label">Deskripsi transaksi:</label><br>
+            <input type="text" id="description" class="form-control" name="description" placeholder="UKT untuk Bulan Mei"><br>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="submit_btn" type="button" class="btn btn-primary create" id="add-task" data-bs-dismiss="modal">Add</button>
             </div>
         </div>
-        {% endfor %}
-    </div>
-    
-    <br>
-    <a href="{% url 'money_tracker:create_transaction' %}">
-        <button type="button" class="btn btn-primary">
-            Transaksi Baru
-        </button>
-    </a>
-    
-    <br>
-    <br>
-    <footer>
-        <div class="footer">
-            <p>Sesi terakhir login: {{ last_login }}</p>
         </div>
-    </footer>
+    </div>
 </body>
+
+<div class="row m-2" id="tracker"></div>
+
 {% endblock content %}
